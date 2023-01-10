@@ -1,7 +1,7 @@
 class DatasetReader:
   def __init__(self):
     self
-
+  # 讀取檔案
   def read(self, dataset):
     return [
       self.list_reader('datasets/%s_w.txt' % dataset),
@@ -13,5 +13,3 @@ class DatasetReader:
     file = open(file_name).read().split('\n')
     file.remove('')
     return list(map(int, file))
-
-DatasetReader().read('p07')
