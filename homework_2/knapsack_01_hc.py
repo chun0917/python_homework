@@ -3,7 +3,7 @@ import random as rn
 from execution_logger import ExecutionLogger
 from datasets_reader import DatasetReader
 
-class Hill_Climbing:
+class HillClimbing:
     # 初始化
     def __init__(self, n, weight, profit, capacity):
         self.n = n
@@ -15,19 +15,19 @@ class Hill_Climbing:
     def run(self):
         self.best_profit = 0
         self.total_weight = 0
-        self.s = [] # 背包放了哪些物品 有放 value = 1,沒放 value = 0
+        self.knapsack = [] # 背包 有放物品 value = 1,沒放物品 value = 0
         self.get_random_solution()
 
         # 預設背包未放物品
         for i in range(0, self.n):
-            self.s.append(0)
+            self.knapsack.append(0)
 
         # 若背包總重量未超過背包容量，則加總隨機解中的物品重量及利潤
         for item in self.solution:
             if self.total_weight + self.weight[item['index']] <= self.capacity:
                 self.best_profit += self.profit[item['index']]
                 self.total_weight += self.weight[item['index']]
-                self.s[item['index']] = 1
+                self.knapsack[item['index']] = 1
 
     # 生成隨機解
     def get_random_solution(self):
@@ -45,5 +45,5 @@ class Hill_Climbing:
         return self.solution
 
 dataset = DatasetReader().read('p07')
-hc = Hill_Climbing(len(dataset[0]), dataset[0], dataset[1], dataset[2])
+hc = HillClimbing(len(dataset[0]), dataset[0], dataset[1], dataset[2])
 ExecutionLogger().run_hc(hc)
