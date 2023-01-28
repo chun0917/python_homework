@@ -7,12 +7,12 @@ from datasets_reader import DatasetReader
 
 class SimulatedAnnealing:
     # 初始化
-    def __init__(self, n, weight, profit, capacity):
+    def __init__(self, n, weight, profit, capacity, best_profit):
         self.n = n
         self.weight = weight
         self.profit = profit
         self.capacity = capacity
-    
+        self.best_profit = best_profit
     # 給 execution_logger 執行的 function
     def run(self):
         self.simulated_annealing()
@@ -35,17 +35,18 @@ class SimulatedAnnealing:
             if self.knapsack[i] == 1:
                 p += self.profit[i]
                 w += self.weight[i]
-        # 若重量大於背包容量，利潤為0
+        # 若重量大於背包容量，預設利潤為0
         if w > self.capacity:
-            p = 0
+            p = self.best_profit
         return (p,w)
 
     # 模擬退火演算法
     def simulated_annealing(self):
         temperature = 10000.0 # 起始溫度
         delta = 0.98 # 降溫係數
+        accept_p = 0 # 允許機率
+        r = 0 # 隨機值
         count = 0
-        best_profit = 0 # 最佳利潤
         self.knapsack = [] # 背包 有放物品 value = 1,沒放物品 value = 0
         count_array = [] # 圖表x軸的陣列(迭代次數)
         profit_array = [] # 圖表y軸的陣列(最佳解)
@@ -66,18 +67,18 @@ class SimulatedAnnealing:
             (temp_profit,_) = self.calculate()
             
             # 若當前利潤大於先前利潤則更新背包、利潤
-            if temp_profit > best_profit:
+            if temp_profit > self.best_profit:
                 self.knapsack = tran_knapsack
-                best_profit = temp_profit
+                self.best_profit = temp_profit
             # 若當前利潤小於先前利潤則進行退火
             else:
-                accept_p = np.exp( (temp_profit - best_profit) / temperature ) # 允許機率
+                accept_p = np.exp( (temp_profit - self.best_profit) / temperature ) # 允許機率
                 r = rnd.random() # 隨機0-1浮點數
 
             # 隨機值小於允許機率就進行更新(跳脫區域最佳利潤)
             if r < accept_p:
                 self.knapsack = tran_knapsack
-                best_profit = temp_profit
+                self.best_profit = temp_profit
 
             if temperature < 0.01:
                 temperature = 0.01
@@ -85,14 +86,13 @@ class SimulatedAnnealing:
                 temperature *= delta # 降溫
                 count += 1
             count_array.append(count + 1)
-            profit_array.append(best_profit)
-
-        print("Best_profit:",best_profit)
+            profit_array.append(self.best_profit)
+        print("Best_profit:",self.best_profit)
         
         # 繪製圖表
         plt.plot(count_array,profit_array)
         plt.show()
 
 dataset = DatasetReader().read('p07')
-sa = SimulatedAnnealing(len(dataset[0]), dataset[0], dataset[1], dataset[2])
+sa = SimulatedAnnealing(len(dataset[0]), dataset[0], dataset[1], dataset[2], 0)
 ExecutionLogger().run_sa(sa)
